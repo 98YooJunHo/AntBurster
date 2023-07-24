@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Coner
+  - End
+  - TurretSpot
+  - Turret
+  - TurretImg
+  - Monster
   layers:
   - Default
   - TransparentFX
@@ -42,11 +48,17 @@ TagManager:
     uniqueID: 0
     locked: 0
   - name: Background
-    uniqueID: 1960262965
+    uniqueID: 854995513
     locked: 0
   - name: Monster
-    uniqueID: 1534426439
+    uniqueID: 264527619
     locked: 0
   - name: Foreground
-    uniqueID: 1026231729
+    uniqueID: 484754115
+    locked: 0
+  - name: Turret
+    uniqueID: 1453459497
+    locked: 0
+  - name: UI
+    uniqueID: 402608587
     locked: 0

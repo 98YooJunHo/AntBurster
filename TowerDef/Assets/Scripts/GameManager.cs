@@ -4,28 +4,148 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject turretArrow;
+    public GameObject turretArrow_Img;
+    public GameObject turretGun;
+    public GameObject turretGun_Img;
 
+    private RaycastHit2D hit;
+    private int life;
+    private bool isDead;
+    private bool isWaitEnd;
+    private bool isPaused;
+    private bool isHoldTurret;
+    private bool isShowTurret;
     private int gold;
     private int killCount;
     private float time;
+    private int score;
     private int timeM;
     private int timeS;
     private TMP_Text timeText;
+    private TMP_Text goldText;
+    private TMP_Text scoreText;
+    private GameObject pauseBotton;
+    private GameObject pauseScene;
+    private GameObject gameOverScene;
     // Start is called before the first frame update
     void Start()
     {
-        time = 0;
+        life = 8;
+        isDead = false;
+        isWaitEnd = false;
+        isPaused = false;
+        isHoldTurret = false;
+        isShowTurret = false;
+        pauseBotton = GameObject.Find("Button_Pause").gameObject;
+        pauseScene = GameObject.Find("Pause").gameObject;
+        gameOverScene = GameObject.Find("GameOver").gameObject;
+        gameOverScene.SetActive(false);
+        pauseScene.SetActive(false);
+        time = 3.5f;
+        score = 0;
+        gold = 150;
         timeText = GameObject.Find("Time").GetComponent<TMP_Text>();
+        goldText = GameObject.Find("Gold").GetComponent<TMP_Text>();
+        scoreText = GameObject.Find("Score").GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        time += Time.deltaTime;
+        IsGameEnd();
+        CurrentTime();
         NowTime();
+        CurrentGold();
+        CurrentScore();
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isDead == false)
+            {
+                if (isPaused == false)
+                {
+                    Pause();
+                }
+
+                if (isPaused == true)
+                {
+                    Resume();
+                }
+
+                if (isHoldTurret == true)
+                {
+                    gold += 30;
+                    isHoldTurret = false;
+                    Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if(isShowTurret == true) 
+            {
+                isHoldTurret = false;
+                isShowTurret = false;
+                Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
+                GameObject turret =
+                    Instantiate(turretArrow, hit.transform.position, hit.transform.rotation);
+            }
+        }
+
+        if (isHoldTurret == true)
+        {
+            Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            hit = Physics2D.Raycast(worldPosition, Vector2.zero);
+
+            if (hit.collider.gameObject.tag == "TurretSpot" && isShowTurret == false)
+            {
+                Vector3 hitPosition = hit.transform.position;
+                Quaternion hitRotation = hit.transform.rotation;
+                GameObject turretImg =
+                    Instantiate(turretArrow_Img, hitPosition, hitRotation);
+                isShowTurret = true;
+            }
+            
+            if (hit.collider.gameObject.tag != "TurretSpot" /*&& isShowTurret == true*/)
+            {
+                Debug.Log(hit.collider.ToString());
+                Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
+                isShowTurret = false;
+            }
+        }
+    }
+
+    void CurrentTime()
+    {
+        if (time <= 0)
+        {
+            isWaitEnd = true;
+        }
+
+        if (isWaitEnd == false)
+        {
+            time -= Time.deltaTime;
+        }
+
+        if (isWaitEnd == true)
+        {
+            time += Time.deltaTime;
+        }
+    }
+
+    void IsGameEnd()
+    {
+        if (life == 0)
+        {
+            isDead = true;
+            Time.timeScale = 0;
+            gameOverScene.SetActive(true);
+        }
     }
 
     void NowTime()
@@ -33,5 +153,96 @@ public class GameManager : MonoBehaviour
         timeM = Convert.ToInt32(Math.Floor(time / 60f));
         timeS = Convert.ToInt32(Math.Floor(time % 60f));
         timeText.text = "Time " + timeM.ToString() + ":" + timeS.ToString();
+    }
+
+    void CurrentScore()
+    {
+        scoreText.text = "Score : " + score.ToString();
+    }
+
+    void CurrentGold()
+    {
+        goldText.text = "Gold : " + gold.ToString();
+    }
+
+    public int Get_KillCount()
+    {
+        return killCount;
+    }
+
+    public bool Get_IsPaused()
+    {
+        return isPaused;
+    }
+
+    public void Buy_Turret()
+    {
+        if(gold < 30)
+        {
+            return;
+        }
+
+        if(isHoldTurret == false)
+        {
+            isHoldTurret = true;
+            gold -= 30;
+        }
+    }
+
+    public void Pause()
+    {
+        isPaused = true;
+        pauseBotton.SetActive(false);
+        Time.timeScale = 0;
+        pauseScene.SetActive(true);
+    }
+
+    public void Resume()
+    {
+        isPaused = false;
+        pauseBotton.SetActive(true);
+        Time.timeScale = 1;
+        pauseScene.SetActive(false);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
+    public void Restart()
+    {
+
+        pauseScene.SetActive(false);
+    }
+
+    public int Get_Life()
+    {
+        return life;
+    }
+
+    public void Set_Life(int nowLife)
+    {
+        life = nowLife;
+    }
+
+    public int Get_Gold()
+    {
+        return gold;    
+    }
+
+    public void Set_Gold(int nowGold)
+    {
+        gold = nowGold;
+    }
+
+    public int Get_Score()
+    {
+        return score;
+    }
+
+    public void Set_Score(int nowScore)
+    {
+        score = nowScore;
     }
 }
