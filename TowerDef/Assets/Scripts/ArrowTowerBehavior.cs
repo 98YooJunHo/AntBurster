@@ -11,7 +11,6 @@ public class ArrowTowerBehavior : MonoBehaviour
     private bool targeted;
     private float timeAfterShoot;
 
-    public int attackDamage;
     public float attackRate;
     public float attackRange;
     // Start is called before the first frame update

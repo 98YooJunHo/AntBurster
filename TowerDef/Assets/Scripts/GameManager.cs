@@ -5,11 +5,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject turretArrow;
     public GameObject turretArrow_Img;
+    public GameObject turretArrow_Img_Cant;
     public GameObject turretGun;
     public GameObject turretGun_Img;
 
@@ -19,7 +21,9 @@ public class GameManager : MonoBehaviour
     private bool isWaitEnd;
     private bool isPaused;
     private bool isHoldTurret;
-    private bool isShowTurret;
+    private bool isShowBuild;
+    private bool isShowCantBuild;
+    private bool isTurretUi;
     private int gold;
     private int killCount;
     private float time;
@@ -29,6 +33,7 @@ public class GameManager : MonoBehaviour
     private TMP_Text timeText;
     private TMP_Text goldText;
     private TMP_Text scoreText;
+    private TMP_Text lifeText;
     private GameObject pauseBotton;
     private GameObject pauseScene;
     private GameObject gameOverScene;
@@ -40,7 +45,8 @@ public class GameManager : MonoBehaviour
         isWaitEnd = false;
         isPaused = false;
         isHoldTurret = false;
-        isShowTurret = false;
+        isShowBuild = false;
+        isShowCantBuild = false;
         pauseBotton = GameObject.Find("Button_Pause").gameObject;
         pauseScene = GameObject.Find("Pause").gameObject;
         gameOverScene = GameObject.Find("GameOver").gameObject;
@@ -48,10 +54,12 @@ public class GameManager : MonoBehaviour
         pauseScene.SetActive(false);
         time = 3.5f;
         score = 0;
+        killCount = 0;
         gold = 150;
         timeText = GameObject.Find("Time").GetComponent<TMP_Text>();
         goldText = GameObject.Find("Gold").GetComponent<TMP_Text>();
         scoreText = GameObject.Find("Score").GetComponent<TMP_Text>();
+        lifeText = GameObject.Find("Life").GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
@@ -62,6 +70,8 @@ public class GameManager : MonoBehaviour
         NowTime();
         CurrentGold();
         CurrentScore();
+        CurrentLife();
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (isDead == false)
@@ -80,6 +90,8 @@ public class GameManager : MonoBehaviour
                 {
                     gold += 30;
                     isHoldTurret = false;
+                    isShowBuild = false;
+                    isShowCantBuild = false;
                     Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
                 }
             }
@@ -87,35 +99,64 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if(isShowTurret == true) 
+            if (isShowBuild == true)
             {
                 isHoldTurret = false;
-                isShowTurret = false;
+                isShowBuild = false;
                 Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
                 GameObject turret =
                     Instantiate(turretArrow, hit.transform.position, hit.transform.rotation);
+                Collider2D turretBuilt = hit.collider;
+                turretBuilt.enabled = false;
             }
+
+
         }
 
         if (isHoldTurret == true)
         {
             Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            hit = Physics2D.Raycast(worldPosition, Vector2.zero);
+            hit = Physics2D.Raycast(worldPosition, Vector2.zero, LayerMask.GetMask("Tile"));
 
-            if (hit.collider.gameObject.tag == "TurretSpot" && isShowTurret == false)
+            if (isShowBuild == false && isShowCantBuild == false)
             {
+                GameObject turretImg =
+                    Instantiate(turretArrow_Img_Cant, worldPosition, Quaternion.identity);
+                isShowCantBuild = true;
+            }
+
+
+            if (hit.collider.gameObject.tag == "TurretSpot")
+            {
+                Debug.Log("터렛짓는곳의 범위에 있다");
+            }
+            else
+            {
+                Debug.Log(hit.collider.gameObject.tag + "\n" + hit.collider.gameObject.name);
+            }
+
+            if (isShowBuild == false)
+            {
+                Debug.Log("설치가능 타워를 보여주지 않고 있다");
+            }
+
+            if (hit.collider.gameObject.tag == "TurretSpot" && isShowBuild == false)
+            {
+                Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
+
                 Vector3 hitPosition = hit.transform.position;
                 Quaternion hitRotation = hit.transform.rotation;
                 GameObject turretImg =
                     Instantiate(turretArrow_Img, hitPosition, hitRotation);
-                isShowTurret = true;
+                isShowBuild = true;
+                isShowCantBuild = false;
             }
-            
-            if (hit.collider.gameObject.tag != "TurretSpot" /*&& isShowTurret == true*/)
+
+            if (hit.collider.gameObject.tag != "TurretSpot" && isShowBuild == true)
             {
                 Debug.Log(hit.collider.ToString());
                 Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
-                isShowTurret = false;
+                isShowBuild = false;
             }
         }
     }
@@ -165,9 +206,19 @@ public class GameManager : MonoBehaviour
         goldText.text = "Gold : " + gold.ToString();
     }
 
+    void CurrentLife()
+    {
+        lifeText.text = "Life : " + life.ToString();
+    }
+
     public int Get_KillCount()
     {
         return killCount;
+    }
+
+    public void Set_KillCount(int nowKillCount)
+    {
+        killCount = nowKillCount;
     }
 
     public bool Get_IsPaused()
@@ -177,12 +228,12 @@ public class GameManager : MonoBehaviour
 
     public void Buy_Turret()
     {
-        if(gold < 30)
+        if (gold < 30)
         {
             return;
         }
 
-        if(isHoldTurret == false)
+        if (isHoldTurret == false)
         {
             isHoldTurret = true;
             gold -= 30;
@@ -191,6 +242,15 @@ public class GameManager : MonoBehaviour
 
     public void Pause()
     {
+        if (isHoldTurret == true)
+        {
+            gold += 30;
+            isHoldTurret = false;
+            isShowBuild = false;
+            isShowCantBuild = false;
+            Destroy(GameObject.FindGameObjectWithTag("TurretImg"));
+        }
+
         isPaused = true;
         pauseBotton.SetActive(false);
         Time.timeScale = 0;
@@ -212,8 +272,8 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
-
-        pauseScene.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1;
     }
 
     public int Get_Life()
@@ -228,7 +288,7 @@ public class GameManager : MonoBehaviour
 
     public int Get_Gold()
     {
-        return gold;    
+        return gold;
     }
 
     public void Set_Gold(int nowGold)
