@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3875535997118078849}
   - component: {fileID: 2373096359086507317}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: GameObject
   m_TagString: Turret
   m_Icon: {fileID: 0}
@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7852390659734487774}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.10000001, y: 0.10000001, z: 0.10000001}
+  m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 9105313894938778137}
-  m_RootOrder: 2
+  m_Father: {fileID: 9105313893862597658}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &2373096359086507317
 BoxCollider2D:
@@ -83,8 +83,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9105313893786603120}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 9105313893862597659}
   m_Layer: 0
   m_Name: Range
-  m_TagString: Untagged
+  m_TagString: Range
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -192,7 +192,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 3875535997118078849}
   m_Father: {fileID: 9105313894938778137}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -258,7 +259,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9105313894938778137}
   - component: {fileID: 9105313894938778138}
-  - component: {fileID: 9105313894938778132}
+  - component: {fileID: 928451436949180647}
   m_Layer: 2
   m_Name: Turret_Arrow
   m_TagString: Turret
@@ -273,14 +274,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9105313894938778136}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9105313893786603121}
   - {fileID: 9105313893862597658}
-  - {fileID: 3875535997118078849}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -300,7 +300,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 3
---- !u!114 &9105313894938778132
+--- !u!114 &928451436949180647
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -313,6 +313,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowPrefab: {fileID: 4130868827304367552, guid: e31d13ff27f3de44881ac9e59faa77e8, type: 3}
-  attackDamage: 0
   attackRate: 0
   attackRange: 0

@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     private TMP_Text goldText;
     private TMP_Text scoreText;
     private TMP_Text lifeText;
+    private TMP_Text scoreText_GameOver;
     private GameObject pauseBotton;
     private GameObject pauseScene;
     private GameObject gameOverScene;
@@ -47,9 +48,11 @@ public class GameManager : MonoBehaviour
         isHoldTurret = false;
         isShowBuild = false;
         isShowCantBuild = false;
+        isTurretUi = false;
         pauseBotton = GameObject.Find("Button_Pause").gameObject;
         pauseScene = GameObject.Find("Pause").gameObject;
         gameOverScene = GameObject.Find("GameOver").gameObject;
+        scoreText_GameOver = GameObject.Find("Score_GameOver").GetComponent<TMP_Text>();
         gameOverScene.SetActive(false);
         pauseScene.SetActive(false);
         time = 3.5f;
@@ -99,6 +102,29 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (isTurretUi == true && isHoldTurret == false)
+            {
+                GameObject[] ranges = GameObject.FindGameObjectsWithTag("Range");
+                foreach (GameObject range in ranges)
+                {
+                    range.GetComponent<SpriteRenderer>().enabled = false;
+                }
+                isTurretUi = false;
+            }
+
+            if (isTurretUi == false && isHoldTurret == false)
+            {
+                Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                hit = Physics2D.Raycast(worldPosition, Vector2.zero, LayerMask.GetMask("Tile"));
+
+                if (hit.collider.gameObject.tag == "Turret")
+                {
+                    SpriteRenderer range = hit.collider.gameObject.GetComponentInParent<SpriteRenderer>();
+                    range.enabled = true;
+                    isTurretUi = true;
+                }
+            }
+
             if (isShowBuild == true)
             {
                 isHoldTurret = false;
@@ -109,8 +135,6 @@ public class GameManager : MonoBehaviour
                 Collider2D turretBuilt = hit.collider;
                 turretBuilt.enabled = false;
             }
-
-
         }
 
         if (isHoldTurret == true)
@@ -126,19 +150,19 @@ public class GameManager : MonoBehaviour
             }
 
 
-            if (hit.collider.gameObject.tag == "TurretSpot")
-            {
-                Debug.Log("터렛짓는곳의 범위에 있다");
-            }
-            else
-            {
-                Debug.Log(hit.collider.gameObject.tag + "\n" + hit.collider.gameObject.name);
-            }
+            //if (hit.collider.gameObject.tag == "TurretSpot")
+            //{
+            //    Debug.Log("터렛짓는곳의 범위에 있다");
+            //}
+            //else
+            //{
+            //    Debug.Log(hit.collider.gameObject.tag + "\n" + hit.collider.gameObject.name);
+            //}
 
-            if (isShowBuild == false)
-            {
-                Debug.Log("설치가능 타워를 보여주지 않고 있다");
-            }
+            //if (isShowBuild == false)
+            //{
+            //    Debug.Log("설치가능 타워를 보여주지 않고 있다");
+            //}
 
             if (hit.collider.gameObject.tag == "TurretSpot" && isShowBuild == false)
             {
@@ -186,6 +210,7 @@ public class GameManager : MonoBehaviour
             isDead = true;
             Time.timeScale = 0;
             gameOverScene.SetActive(true);
+            scoreText_GameOver.text = "Score : " + score.ToString();
         }
     }
 
@@ -233,7 +258,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (isHoldTurret == false)
+        if (isHoldTurret == false && isTurretUi == false)
         {
             isHoldTurret = true;
             gold -= 30;
